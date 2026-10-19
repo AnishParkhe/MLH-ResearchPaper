@@ -1,0 +1,578 @@
+{
+ "simulate:C1": {
+  "xLabel": "Sequence Length Multiple (vs. Training Length)",
+  "yLabel": "Exact Match Sequence Accuracy (%)",
+  "points": [
+   {
+    "x": 1,
+    "ifTrue": 99.5,
+    "ifFalse": 99.2
+   },
+   {
+    "x": 1.5,
+    "ifTrue": 98.8,
+    "ifFalse": 92.1
+   },
+   {
+    "x": 2,
+    "ifTrue": 97.5,
+    "ifFalse": 78.4
+   },
+   {
+    "x": 2.5,
+    "ifTrue": 96,
+    "ifFalse": 58.2
+   },
+   {
+    "x": 3,
+    "ifTrue": 94.2,
+    "ifFalse": 36.5
+   },
+   {
+    "x": 3.5,
+    "ifTrue": 92.1,
+    "ifFalse": 21
+   },
+   {
+    "x": 4,
+    "ifTrue": 89.5,
+    "ifFalse": 11.3
+   },
+   {
+    "x": 5,
+    "ifTrue": 84,
+    "ifFalse": 2.5
+   },
+   {
+    "x": 6,
+    "ifTrue": 77.2,
+    "ifFalse": 0.4
+   },
+   {
+    "x": 7,
+    "ifTrue": 69.8,
+    "ifFalse": 0
+   },
+   {
+    "x": 8,
+    "ifTrue": 61.5,
+    "ifFalse": 0
+   },
+   {
+    "x": 9,
+    "ifTrue": 53,
+    "ifFalse": 0
+   },
+   {
+    "x": 10,
+    "ifTrue": 45.2,
+    "ifFalse": 0
+   }
+  ],
+  "narrative": "This graph simulates model performance on hierarchical formal language tasks across increasing sequence lengths beyond training context. If the claim holds true, positional representations and multi-head attention generalize sequential tracking smoothly, maintaining substantial accuracy at extended lengths. If false, the pure self-attention architecture sharply collapses beyond the training length due to a lack of explicit recurrent state tracking.",
+  "decisiveRegion": "The decisive region is between 2x and 5x length multiples, where the true claim maintains over 80% accuracy while a false claim drops to near zero."
+ },
+ "simulate:C2": {
+  "xLabel": "Training Compute Budget (FLOPs x 10^18)",
+  "yLabel": "WMT 2014 EN-DE BLEU Score",
+  "points": [
+   {
+    "x": 0.5,
+    "ifTrue": 18.2,
+    "ifFalse": 18.5
+   },
+   {
+    "x": 1,
+    "ifTrue": 21,
+    "ifFalse": 21.3
+   },
+   {
+    "x": 2,
+    "ifTrue": 23.5,
+    "ifFalse": 23.8
+   },
+   {
+    "x": 3,
+    "ifTrue": 24.8,
+    "ifFalse": 25.1
+   },
+   {
+    "x": 5,
+    "ifTrue": 26.2,
+    "ifFalse": 26.5
+   },
+   {
+    "x": 8,
+    "ifTrue": 27.1,
+    "ifFalse": 27.4
+   },
+   {
+    "x": 12,
+    "ifTrue": 27.6,
+    "ifFalse": 27.9
+   },
+   {
+    "x": 16,
+    "ifTrue": 28,
+    "ifFalse": 28.2
+   },
+   {
+    "x": 20,
+    "ifTrue": 28.3,
+    "ifFalse": 28.5
+   },
+   {
+    "x": 23,
+    "ifTrue": 28.4,
+    "ifFalse": 28.7
+   },
+   {
+    "x": 27,
+    "ifTrue": 28.6,
+    "ifFalse": 28.9
+   },
+   {
+    "x": 30,
+    "ifTrue": 28.7,
+    "ifFalse": 29
+   }
+  ],
+  "narrative": "This chart compares the best BLEU score achieved by baseline recurrent/convolutional models (e.g. ConvS2S, GNMT) against the benchmark Transformer performance across varying training compute budgets on WMT 2014 EN-DE. If the claim is true, baseline models optimized with modern tricks still plateau around 26-27 BLEU and fail to reach the Transformer's SOTA performance at equivalent FLOPs. If the claim is false, modern regularization and training schedules allow ConvS2S or GNMT to match or exceed the 28.4 BLEU threshold under the same budget.",
+  "decisiveRegion": "The decisive region occurs at compute budgets exceeding 15 x 10^18 FLOPs (approaching the benchmark budget of 23 x 10^18 FLOPs), where baseline models either saturate below 27 BLEU or successfully achieve >=28.4 BLEU."
+ },
+ "simulate:C3": {
+  "xLabel": "Sequence Length (Tokens)",
+  "yLabel": "Key Retrieval Accuracy (%)",
+  "points": [
+   {
+    "x": 500,
+    "ifTrue": 100,
+    "ifFalse": 100
+   },
+   {
+    "x": 1000,
+    "ifTrue": 99.5,
+    "ifFalse": 98
+   },
+   {
+    "x": 1500,
+    "ifTrue": 99,
+    "ifFalse": 94
+   },
+   {
+    "x": 2000,
+    "ifTrue": 98.5,
+    "ifFalse": 88
+   },
+   {
+    "x": 2500,
+    "ifTrue": 98,
+    "ifFalse": 80
+   },
+   {
+    "x": 3000,
+    "ifTrue": 97.5,
+    "ifFalse": 70
+   },
+   {
+    "x": 3500,
+    "ifTrue": 97,
+    "ifFalse": 58
+   },
+   {
+    "x": 4000,
+    "ifTrue": 96.5,
+    "ifFalse": 45
+   },
+   {
+    "x": 4500,
+    "ifTrue": 96,
+    "ifFalse": 35
+   },
+   {
+    "x": 5000,
+    "ifTrue": 95.5,
+    "ifFalse": 25
+   },
+   {
+    "x": 6000,
+    "ifTrue": 94.5,
+    "ifFalse": 15
+   },
+   {
+    "x": 7000,
+    "ifTrue": 93.5,
+    "ifFalse": 8
+   },
+   {
+    "x": 8000,
+    "ifTrue": 92,
+    "ifFalse": 5
+   }
+  ],
+  "narrative": "If the claim holds true, self-attention's O(1) path length maintains near-perfect retrieval accuracy even as the distractor sequence scales past 5,000 tokens. Conversely, if theoretical path length fails to aid optimization due to attention dilution or gradient noise, key retrieval accuracy drops sharply beyond 3,000 tokens relative to dilated convolutions.",
+  "decisiveRegion": "The decisive region occurs between 4,000 and 8,000 tokens, where the curves diverge dramatically between high maintained accuracy and near-random retrieval performance."
+ },
+ "simulate:C5": {
+  "xLabel": "Sentence Length (Number of Tokens)",
+  "yLabel": "Percentage of Syntactically Invalid Parse Trees (%)",
+  "points": [
+   {
+    "x": 10,
+    "ifTrue": 0,
+    "ifFalse": 0.5
+   },
+   {
+    "x": 15,
+    "ifTrue": 0,
+    "ifFalse": 1.2
+   },
+   {
+    "x": 20,
+    "ifTrue": 0.1,
+    "ifFalse": 3.1
+   },
+   {
+    "x": 25,
+    "ifTrue": 0.1,
+    "ifFalse": 6.8
+   },
+   {
+    "x": 30,
+    "ifTrue": 0.2,
+    "ifFalse": 12.4
+   },
+   {
+    "x": 35,
+    "ifTrue": 0.3,
+    "ifFalse": 19.5
+   },
+   {
+    "x": 40,
+    "ifTrue": 0.4,
+    "ifFalse": 28.1
+   },
+   {
+    "x": 45,
+    "ifTrue": 0.5,
+    "ifFalse": 37.6
+   },
+   {
+    "x": 50,
+    "ifTrue": 0.6,
+    "ifFalse": 48
+   },
+   {
+    "x": 55,
+    "ifTrue": 0.8,
+    "ifFalse": 57.3
+   },
+   {
+    "x": 60,
+    "ifTrue": 1,
+    "ifFalse": 66.2
+   },
+   {
+    "x": 65,
+    "ifTrue": 1.2,
+    "ifFalse": 74
+   },
+   {
+    "x": 70,
+    "ifTrue": 1.5,
+    "ifFalse": 80.5
+   }
+  ],
+  "narrative": "This chart evaluates how sequence length impacts structural parse validity in out-of-domain evaluation. If the claim holds, the Transformer maintains near-zero structural error rates across all sentence lengths due to strong implicit structural learning. If the claim is false, the lack of explicit inductive bias causes the structural error rate to rapidly escalate as sentence complexity and length increase.",
+  "decisiveRegion": "The decisive region is for sentences longer than 30 tokens, where a true sequence-to-sequence limitation manifests as a sharp increase in bracket unbalancing."
+ },
+ "simulate:C6": {
+  "xLabel": "Key Dimension (dk)",
+  "yLabel": "Softmax Gradient Magnitude (10^-4)",
+  "points": [
+   {
+    "x": 16,
+    "ifTrue": 8.5,
+    "ifFalse": 8.5
+   },
+   {
+    "x": 32,
+    "ifTrue": 6.2,
+    "ifFalse": 7.8
+   },
+   {
+    "x": 48,
+    "ifTrue": 3.8,
+    "ifFalse": 7.2
+   },
+   {
+    "x": 64,
+    "ifTrue": 1.9,
+    "ifFalse": 6.9
+   },
+   {
+    "x": 80,
+    "ifTrue": 0.7,
+    "ifFalse": 6.5
+   },
+   {
+    "x": 96,
+    "ifTrue": 0.2,
+    "ifFalse": 6.3
+   },
+   {
+    "x": 112,
+    "ifTrue": 0.05,
+    "ifFalse": 6
+   },
+   {
+    "x": 128,
+    "ifTrue": 0.01,
+    "ifFalse": 5.8
+   },
+   {
+    "x": 144,
+    "ifTrue": 0.002,
+    "ifFalse": 5.6
+   },
+   {
+    "x": 160,
+    "ifTrue": 0.0005,
+    "ifFalse": 5.5
+   },
+   {
+    "x": 176,
+    "ifTrue": 0.0001,
+    "ifFalse": 5.3
+   },
+   {
+    "x": 192,
+    "ifTrue": 0.00003,
+    "ifFalse": 5.2
+   },
+   {
+    "x": 208,
+    "ifTrue": 0.00001,
+    "ifFalse": 5
+   },
+   {
+    "x": 224,
+    "ifTrue": 0.000002,
+    "ifFalse": 4.9
+   },
+   {
+    "x": 240,
+    "ifTrue": 0.000001,
+    "ifFalse": 4.8
+   },
+   {
+    "x": 256,
+    "ifTrue": 0,
+    "ifFalse": 4.7
+   }
+  ],
+  "narrative": "This chart tracks the softmax gradient magnitude in an unscaled Transformer model as the key dimension dk increases. If the claim is true, increasing dk causes dot products to grow large, pushing softmax into extreme saturation and causing gradients to vanish near zero. If false, layer normalization or optimizer stability prevents vanishing gradients, maintaining robust gradient magnitudes even at high dimensions.",
+  "decisiveRegion": "The experiment is decisive at dk >= 128, where the true claim predicts near-zero vanishing gradients (< 0.01) while the false claim maintains healthy, non-saturating gradient flow (> 5.0)."
+ },
+ "playable:Q1": {
+  "expression": "exp(x * s / sqrt(dk)) / (exp(x * s / sqrt(dk)) + exp(-x * s / sqrt(dk)))",
+  "xVar": "x",
+  "xMin": -5,
+  "xMax": 5,
+  "xLabel": "Dot Product (Q*K^T)",
+  "yLabel": "Attention Weight",
+  "params": [
+   {
+    "symbol": "dk",
+    "name": "Key Dimension",
+    "min": 1,
+    "max": 128,
+    "value": 64,
+    "step": 1
+   },
+   {
+    "symbol": "s",
+    "name": "Scaling Factor",
+    "min": 0.1,
+    "max": 5,
+    "value": 1,
+    "step": 0.1
+   }
+  ],
+  "insight": "Drag the Key Dimension (dk) slider to see how the scaling factor flattens the softmax distribution, preventing gradients from vanishing."
+ },
+ "playable:Q2": {
+  "expression": "d_model * sqrt(h)",
+  "xVar": "h",
+  "xMin": 1,
+  "xMax": 16,
+  "xLabel": "Number of Heads (h)",
+  "yLabel": "Total Effective Representation Capacity",
+  "params": [
+   {
+    "symbol": "d_model",
+    "name": "Model Dimension (d_model)",
+    "min": 64,
+    "max": 1024,
+    "value": 512,
+    "step": 64
+   }
+  ],
+  "insight": "Vary the number of attention heads (h) to see how multi-head attention splits d_model into subspaces, enabling parallel focus across different representation aspects."
+ },
+ "playable:Q3": {
+  "expression": "max(0, x * w1 + b1) * w2 + b2",
+  "xVar": "x",
+  "xMin": -5,
+  "xMax": 5,
+  "xLabel": "Input x",
+  "yLabel": "Output FFN(x)",
+  "params": [
+   {
+    "symbol": "w1",
+    "name": "Weight 1",
+    "min": -5,
+    "max": 5,
+    "value": 1,
+    "step": 0.1
+   },
+   {
+    "symbol": "b1",
+    "name": "Bias 1",
+    "min": -5,
+    "max": 5,
+    "value": 0,
+    "step": 0.1
+   },
+   {
+    "symbol": "w2",
+    "name": "Weight 2",
+    "min": -5,
+    "max": 5,
+    "value": 1,
+    "step": 0.1
+   },
+   {
+    "symbol": "b2",
+    "name": "Bias 2",
+    "min": -5,
+    "max": 5,
+    "value": 0,
+    "step": 0.1
+   }
+  ],
+  "insight": "Adjust w1 and b1 to shift and scale the ReLU activation point, then use w2 and b2 to scale and offset the final output projection."
+ },
+ "playable:Q4": {
+  "expression": "sin(pos / pow(10000, (2 * i) / d_model))",
+  "xVar": "pos",
+  "xMin": 0,
+  "xMax": 100,
+  "xLabel": "Token Position (pos)",
+  "yLabel": "Encoding Value",
+  "params": [
+   {
+    "symbol": "i",
+    "name": "Dimension Index (i)",
+    "min": 0,
+    "max": 255,
+    "value": 0,
+    "step": 1
+   },
+   {
+    "symbol": "d_model",
+    "name": "Model Dimension (d_model)",
+    "min": 64,
+    "max": 1024,
+    "value": 512,
+    "step": 64
+   }
+  ],
+  "insight": "Increase the dimension index i to see how higher dimensions correspond to vastly longer wavelengths, allowing the model to attend to relative positions at multiple scales."
+ },
+ "playable:Q5": {
+  "expression": "d_model^(-0.5) * min(x^(-0.5), x * warmup^(-1.5))",
+  "xVar": "x",
+  "xMin": 1,
+  "xMax": 40000,
+  "xLabel": "Training Step (step_num)",
+  "yLabel": "Learning Rate (lrate)",
+  "params": [
+   {
+    "symbol": "d_model",
+    "name": "Model Dimension (d_model)",
+    "min": 128,
+    "max": 2048,
+    "value": 512,
+    "step": 64
+   },
+   {
+    "symbol": "warmup",
+    "name": "Warmup Steps",
+    "min": 500,
+    "max": 10000,
+    "value": 4000,
+    "step": 500
+   }
+  ],
+  "insight": "Adjust the warmup steps to shift the peak of the learning rate curve, or increase d_model to uniformly scale down the learning rate magnitude."
+ },
+ "simulate:C4": {
+  "xLabel": "Training Steps (in thousands)",
+  "yLabel": "BLEU Score Difference (Independent Heads - Shared Head)",
+  "points": [
+   {
+    "x": 10,
+    "ifTrue": 0.05,
+    "ifFalse": 0.02
+   },
+   {
+    "x": 20,
+    "ifTrue": 0.15,
+    "ifFalse": 0.04
+   },
+   {
+    "x": 30,
+    "ifTrue": 0.28,
+    "ifFalse": 0.05
+   },
+   {
+    "x": 40,
+    "ifTrue": 0.42,
+    "ifFalse": 0.06
+   },
+   {
+    "x": 50,
+    "ifTrue": 0.58,
+    "ifFalse": 0.07
+   },
+   {
+    "x": 60,
+    "ifTrue": 0.71,
+    "ifFalse": 0.06
+   },
+   {
+    "x": 70,
+    "ifTrue": 0.82,
+    "ifFalse": 0.08
+   },
+   {
+    "x": 80,
+    "ifTrue": 0.9,
+    "ifFalse": 0.07
+   },
+   {
+    "x": 90,
+    "ifTrue": 0.94,
+    "ifFalse": 0.06
+   },
+   {
+    "x": 100,
+    "ifTrue": 0.98,
+    "ifFalse": 0.05
+   }
+  ],
+  "narrative": "This chart tracks the gap in translation quality (BLEU) between a standard multi-head Transformer and an ablated model where all 8 projection heads are forced to share a single averaged attention map. If the claim is true, diverse attention distributions across distinct subspaces are vital, leading to a substantial performance deficit of nearly 1.0 BLEU when heads share identical attention maps. If the claim is false, the separate linear projection matrices alone provide sufficient expressive power, and the shared-attention ablation converges within 0.1 BLEU of the baseline.",
+  "decisiveRegion": "The decisive region occurs from 60k to 100k training steps, where model convergence reveals whether the BLEU deficit stabilizes near 0.06 BLEU (falsifying the claim) or maintains a gap near 1.0 BLEU (confirming the claim)."
+ }
+}

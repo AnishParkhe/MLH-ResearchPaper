@@ -1,0 +1,741 @@
+{
+  "paper": {
+    "title": "Attention Is All You Need",
+    "authors": [
+      "Ashish Vaswani",
+      "Noam Shazeer",
+      "Niki Parmar",
+      "Jakob Uszkoreit",
+      "Llion Jones",
+      "Aidan N. Gomez",
+      "Łukasz Kaiser",
+      "Illia Polosukhin"
+    ],
+    "year": 2017,
+    "venue": "31st Conference on Neural Information Processing Systems (NIPS 2017)",
+    "field": "Natural Language Processing",
+    "tldr": "The Transformer is a sequence transduction architecture that completely replaces recurrence and convolutions with multi-head self-attention. It sets new state-of-the-art benchmarks in machine translation while training substantially faster due to superior parallelization.",
+    "hook": "By demonstrating that self-attention alone can replace recurrent architectures, this paper established the foundational blueprint for modern large language models."
+  },
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Sequence transduction models can rely entirely on self-attention mechanisms without recurrent or convolutional layers.",
+      "short": "Attention Replaces Recurrence",
+      "type": "central",
+      "confidence": 95,
+      "page": 2,
+      "quote": "we propose the Transformer, a model architecture eschewing recurrence and instead relying entirely on an attention mechanism to draw global dependencies between input and output.",
+      "evidenceIds": [
+        "E1",
+        "E2",
+        "E3"
+      ],
+      "assumptionIds": [
+        "A1",
+        "A3",
+        "A4"
+      ],
+      "objections": [
+        "Eliminating recurrent state transitions entirely may prevent the model from capturing strictly sequential grammatical constraints or counting dependencies.",
+        "Without structural sequential inductive biases, the architecture may overfit or degrade rapidly when sequence lengths significantly exceed the training context."
+      ],
+      "falsify": {
+        "hypothesis": "A pure self-attention network cannot learn sequential hierarchical grammar tasks that recurrent networks with equivalent parameter counts solve easily.",
+        "setup": [
+          "Train both a 6-layer Transformer and an optimized LSTM on formal language benchmarks requiring state-counting and parenthesis matching (e.g., Dyck languages).",
+          "Test both architectures on sequences 2x to 10x longer than those seen during training.",
+          "Measure exact sequence prediction accuracy across increasing sequence lengths without fine-tuning."
+        ],
+        "metric": "Exact match sequence accuracy on length-extrapolated Dyck language tests",
+        "predictionIfFalse": "The Transformer fails to maintain bracket matching validity beyond the maximum training length while the recurrent network generalizes robustly.",
+        "difficulty": "medium",
+        "cost": "$500 - $2,000 compute",
+        "timeEstimate": "1-2 weeks"
+      }
+    },
+    {
+      "id": "C2",
+      "text": "The Transformer establishes a new state of the art on English-to-German and English-to-French translation at a fraction of previous training costs.",
+      "short": "State-of-the-Art Translation",
+      "type": "empirical",
+      "confidence": 95,
+      "page": 8,
+      "quote": "outperforms the best previously reported models (including ensembles) by more than 2.0 BLEU, establishing a new state-of-the-art BLEU score of 28.4.",
+      "evidenceIds": [
+        "E1",
+        "E2"
+      ],
+      "assumptionIds": [
+        "A1"
+      ],
+      "objections": [
+        "BLEU score improvements might stem heavily from hyperparameter exploration and large batch sizes rather than the core attention architecture.",
+        "Floating-point operation estimates across disparate hardware architectures (P100 vs K40/K80) may misrepresent true training efficiency gains."
+      ],
+      "falsify": {
+        "hypothesis": "Recurrent or convolutional baselines trained with identical batch token counts, Adam optimizer schedules, and label smoothing match or exceed Transformer BLEU scores at comparable FLOP budgets.",
+        "setup": [
+          "Implement GNMT and ConvS2S using identical subword tokenization, warm-up learning rate schedules, and label smoothing (0.1).",
+          "Train all architectures on WMT 2014 English-to-German under an identical compute budget of 2.3 x 10^19 FLOPs.",
+          "Evaluate newstest2014 BLEU using standard multi-bleu scripts with checkpoint averaging."
+        ],
+        "metric": "BLEU score on WMT 2014 English-to-German newstest2014 at equivalent FLOPs",
+        "predictionIfFalse": "ConvS2S or GNMT achieves greater than or equal to 28.4 BLEU under the same compute budget.",
+        "difficulty": "medium",
+        "cost": "$5,000 - $15,000 compute",
+        "timeEstimate": "3-4 weeks"
+      }
+    },
+    {
+      "id": "C3",
+      "text": "Self-attention layers connect all input positions in O(1) sequential operations, shortening path lengths and facilitating the learning of long-range dependencies.",
+      "short": "Constant Path Length",
+      "type": "theoretical",
+      "confidence": 90,
+      "page": 6,
+      "quote": "a self-attention layer connects all positions with a constant number of sequentially executed operations, whereas a recurrent layer requires O(n) sequential operations.",
+      "evidenceIds": [
+        "E3"
+      ],
+      "assumptionIds": [
+        "A3"
+      ],
+      "objections": [
+        "Theoretical O(1) path length does not guarantee that gradient information effectively propagates through dense softmax normalizations across extreme sequence lengths.",
+        "The O(n^2) pairwise computational and memory footprint makes constant path length impractical for very long sequences compared to linear or dilated convolutional networks."
+      ],
+      "falsify": {
+        "hypothesis": "On synthetic associative retrieval tasks with distractor lengths exceeding 5,000 tokens, standard self-attention fails to outperform dilated convolutional models despite having shorter theoretical path lengths.",
+        "setup": [
+          "Construct a needle-in-a-haystack key-value retrieval task with sequence lengths from 500 to 8,000 tokens.",
+          "Train a standard self-attention network and a ByteNet-style dilated convolutional network of matching capacity.",
+          "Measure retrieval accuracy and gradient norm backpropagated from the target output to the key position."
+        ],
+        "metric": "Key retrieval accuracy as a function of sequence length",
+        "predictionIfFalse": "Transformer retrieval accuracy degrades faster than dilated convolutions as distance increases.",
+        "difficulty": "medium",
+        "cost": "$1,000 - $3,000 compute",
+        "timeEstimate": "2 weeks"
+      }
+    },
+    {
+      "id": "C4",
+      "text": "Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions, outperforming single-head attention.",
+      "short": "Multi-Head Subspace Diversity",
+      "type": "empirical",
+      "confidence": 90,
+      "page": 5,
+      "quote": "Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions.",
+      "evidenceIds": [
+        "E4"
+      ],
+      "assumptionIds": [
+        "A4"
+      ],
+      "objections": [
+        "Individual attention heads may learn redundant representations rather than distinct functional subspaces.",
+        "The performance gain of multi-head over single-head attention might be an artifact of additional projection matrices rather than multiple attention distributions."
+      ],
+      "falsify": {
+        "hypothesis": "Constraining an 8-head Transformer so that all heads share an identical attention map (while maintaining separate projection matrices) matches the BLEU performance of unconstrained multi-head attention.",
+        "setup": [
+          "Train a base Transformer on WMT 2014 English-to-German with 8 independent heads.",
+          "Train an ablated model with 8 projection heads whose attention distribution matrices are averaged into a single shared attention map before computing values.",
+          "Evaluate both models on newstest2013 and newstest2014 development and test sets."
+        ],
+        "metric": "BLEU score difference between independent-attention heads and shared-attention heads",
+        "predictionIfFalse": "The shared-attention variant achieves translation scores within 0.1 BLEU of the independent multi-head baseline.",
+        "difficulty": "easy",
+        "cost": "$500 - $1,500 compute",
+        "timeEstimate": "1 week"
+      }
+    },
+    {
+      "id": "C5",
+      "text": "The Transformer architecture generalizes successfully to English constituency parsing despite strong structural constraints and limited training data.",
+      "short": "Generalization to Parsing",
+      "type": "empirical",
+      "confidence": 85,
+      "page": 10,
+      "quote": "our model performs surprisingly well, yielding better results than all previously reported models with the exception of the Recurrent Neural Network Grammar",
+      "evidenceIds": [
+        "E6"
+      ],
+      "assumptionIds": [
+        "A1"
+      ],
+      "objections": [
+        "A sequence-to-sequence model lacking explicit tree grammar inductive biases may produce high rates of structurally invalid or non-closing parse trees on out-of-domain data.",
+        "High performance in the semi-supervised regime may reflect the massive size of the silver corpus (17M sentences) rather than the model's structural competence."
+      ],
+      "falsify": {
+        "hypothesis": "On complex or out-of-domain sentences, the Transformer produces malformed bracket structures at a significantly higher rate than dedicated transition-based parsers.",
+        "setup": [
+          "Evaluate the WSJ-trained 4-layer Transformer parser on out-of-domain test sets (e.g., Brown corpus, biomedical text).",
+          "Check outputs for structural validity (balanced brackets, valid non-terminal node labels).",
+          "Compare structural well-formedness and F1 scores against the Recurrent Neural Network Grammar."
+        ],
+        "metric": "Percentage of syntactically invalid/unbalanced generated tree structures",
+        "predictionIfFalse": "The Transformer maintains a 0% structural error rate and matches or exceeds RNNG parsing F1 on out-of-domain evaluation.",
+        "difficulty": "medium",
+        "cost": "$300 - $1,000 compute",
+        "timeEstimate": "1-2 weeks"
+      }
+    },
+    {
+      "id": "C6",
+      "text": "Scaling the query-key dot products by the inverse square root of the key dimension is necessary to prevent vanishing gradients in the softmax function for large dimensions.",
+      "short": "Dot-Product Scaling",
+      "type": "theoretical",
+      "confidence": 95,
+      "page": 4,
+      "quote": "for large values of dk, the dot products grow large in magnitude, pushing the softmax function into regions where it has extremely small gradients",
+      "evidenceIds": [
+        "E5"
+      ],
+      "assumptionIds": [
+        "A2"
+      ],
+      "objections": [
+        "Alternative normalization techniques such as LayerNorm or weight normalization on keys and queries could prevent softmax saturation without explicit scaling factors.",
+        "For moderate key dimensions (dk <= 64), unscaled attention may train stably with appropriate learning rate warm-up."
+      ],
+      "falsify": {
+        "hypothesis": "Training an unscaled dot-product attention Transformer with dk=128 or larger achieves the same convergence speed and BLEU as the scaled version without gradient clipping issues.",
+        "setup": [
+          "Train two Transformer base models with dk=128: one with 1/sqrt(dk) scaling and one without scaling.",
+          "Keep optimizer, learning rate schedule, initialization, and seeds identical.",
+          "Track gradient norms of the softmax layer and training perplexity across the first 20,000 steps."
+        ],
+        "metric": "Softmax gradient magnitude and training perplexity convergence rate",
+        "predictionIfFalse": "The unscaled model converges stably and achieves final BLEU scores indistinguishable from the scaled model.",
+        "difficulty": "easy",
+        "cost": "$300 - $800 compute",
+        "timeEstimate": "3-5 days"
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E1",
+      "kind": "table",
+      "short": "WMT 2014 EN-DE SOTA",
+      "summary": "Transformer (big) achieved 28.4 BLEU on the WMT 2014 English-to-German test set, surpassing existing single models and ensembles by over 2.0 BLEU at 2.3 x 10^19 FLOPs.",
+      "quote": "The Transformer achieves better BLEU scores than previous state-of-the-art models on the English-to-German and English-to-French newstest2014 tests at a fraction of the training cost.",
+      "page": 8,
+      "strength": 95
+    },
+    {
+      "id": "E2",
+      "kind": "table",
+      "short": "WMT 2014 EN-FR SOTA",
+      "summary": "On the WMT 2014 English-to-French benchmark, Transformer (big) achieved a BLEU score of 41.8 (41.0 in single checkpoint evaluation) using less than a quarter of the training cost of prior SOTA.",
+      "quote": "our big model achieves a BLEU score of 41.0, outperforming all of the previously published single models, at less than 1/4 the training cost",
+      "page": 8,
+      "strength": 92
+    },
+    {
+      "id": "E3",
+      "kind": "table",
+      "short": "Complexity and Path Length Comparison",
+      "summary": "Table 1 compares layer types, showing self-attention requires O(1) sequential operations and O(1) maximum path length versus O(n) for recurrent layers and O(log_k(n)) for convolutional layers.",
+      "quote": "Table 1: Maximum path lengths, per-layer complexity and minimum number of sequential operations for different layer types.",
+      "page": 6,
+      "strength": 90
+    },
+    {
+      "id": "E4",
+      "kind": "table",
+      "short": "Attention Heads Ablation",
+      "summary": "Table 3 row A shows that 8 attention heads achieved 25.8 BLEU, whereas a single attention head with full dimensionality dropped to 24.9 BLEU (a 0.9 BLEU loss).",
+      "quote": "While single-head attention is 0.9 BLEU worse than the best setting, quality also drops off with too many heads.",
+      "page": 9,
+      "strength": 88
+    },
+    {
+      "id": "E5",
+      "kind": "table",
+      "short": "Key Size dk Ablation",
+      "summary": "Table 3 row B demonstrates that reducing key dimension dk to 16 and 32 degraded development BLEU to 25.1 and 25.4 respectively, indicating that compatibility determination requires sufficient representation space.",
+      "quote": "we observe that reducing the attention key size dk hurts model quality. This suggests that determining compatibility is not easy",
+      "page": 9,
+      "strength": 82
+    },
+    {
+      "id": "E6",
+      "kind": "experiment",
+      "short": "Constituency Parsing Benchmark",
+      "summary": "Applying a 4-layer Transformer to English constituency parsing achieved 91.3 F1 on WSJ Section 23 in the WSJ-only setting and 92.7 F1 semi-supervised, outperforming prior discriminative RNN models without task tuning.",
+      "quote": "We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.",
+      "page": 1,
+      "strength": 85
+    },
+    {
+      "id": "E7",
+      "kind": "table",
+      "short": "Positional Encoding Ablation",
+      "summary": "Table 3 row E shows that replacing fixed sinusoidal positional encodings with learned positional embeddings resulted in identical performance (25.7 BLEU on dev).",
+      "quote": "we replace our sinusoidal positional encoding with learned positional embeddings [9], and observe nearly identical results to the base model.",
+      "page": 9,
+      "strength": 80
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A1",
+      "short": "Order Information via Encodings",
+      "text": "Token position information can be fully captured by summing fixed or learned coordinate vectors with embedding representations, without requiring sequential computation.",
+      "explicit": true,
+      "fragility": 35,
+      "page": 6,
+      "quote": "we must inject some information about the relative or absolute position of the tokens in the sequence."
+    },
+    {
+      "id": "A2",
+      "short": "Dot-Product Component Independence",
+      "text": "Query and key vector components can be approximated as independent random variables with zero mean and unit variance when justifying the square-root scaling factor.",
+      "explicit": true,
+      "fragility": 50,
+      "page": 4,
+      "quote": "assume that the components of q and k are independent random variables with mean 0 and variance 1."
+    },
+    {
+      "id": "A3",
+      "short": "Shorter Paths Ease Optimization",
+      "text": "Minimizing the maximum path length between token positions in a network directly facilitates the learning of long-range dependencies.",
+      "explicit": true,
+      "fragility": 25,
+      "page": 6,
+      "quote": "The shorter these paths between any combination of positions in the input and output sequences, the easier it is to learn long-range dependencies"
+    },
+    {
+      "id": "A4",
+      "short": "Single-Head Resolution Loss",
+      "text": "Averaging attention-weighted positions within a single attention head leads to reduced effective resolution that must be remedied by multiple projected subspaces.",
+      "explicit": true,
+      "fragility": 30,
+      "page": 2,
+      "quote": "albeit at the cost of reduced effective resolution due to averaging attention-weighted positions, an effect we counteract with Multi-Head Attention"
+    }
+  ],
+  "methods": [
+    {
+      "id": "M1",
+      "short": "Scaled Dot-Product Attention",
+      "description": "An attention function that computes inner products of queries with keys, divides by the square root of key dimension dk, applies a softmax function to obtain weights, and outputs a weighted sum of values.",
+      "page": 4
+    },
+    {
+      "id": "M2",
+      "short": "Multi-Head Attention",
+      "description": "A mechanism that linearly projects queries, keys, and values h times into lower-dimensional subspaces (dk, dv), executes scaled dot-product attention in parallel across all projections, concatenates outputs, and applies a final projection matrix.",
+      "page": 5
+    },
+    {
+      "id": "M3",
+      "short": "Sinusoidal Positional Encoding",
+      "description": "Deterministic positional representations generated via sine and cosine functions of geometric progression frequencies added to the input and output embeddings to encode token ordering.",
+      "page": 6
+    },
+    {
+      "id": "M4",
+      "short": "Transformer Architecture",
+      "description": "An encoder-decoder structure consisting of stacks of identical layers, each containing multi-head self-attention and position-wise feed-forward sublayers wrapped with residual connections and layer normalization.",
+      "page": 3
+    }
+  ],
+  "equations": [
+    {
+      "id": "Q1",
+      "name": "Scaled Dot-Product Attention",
+      "latex": "\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right)V",
+      "meaning": "Computes attention weights via scaled dot products between query and key matrices, normalized by softmax, and weights the value matrix.",
+      "page": 4,
+      "variables": [
+        {
+          "symbol": "Q",
+          "meaning": "Matrix of packed query vectors of dimension d_k"
+        },
+        {
+          "symbol": "K",
+          "meaning": "Matrix of packed key vectors of dimension d_k"
+        },
+        {
+          "symbol": "V",
+          "meaning": "Matrix of packed value vectors of dimension d_v"
+        },
+        {
+          "symbol": "d_k",
+          "meaning": "Dimensionality of the queries and keys"
+        }
+      ]
+    },
+    {
+      "id": "Q2",
+      "name": "Multi-Head Attention",
+      "latex": "\\text{MultiHead}(Q, K, V) = \\text{Concat}(\\text{head}_1, \\dots, \\text{head}_h)W^O \\quad \\text{where} \\quad \\text{head}_i = \\text{Attention}(QW_i^Q, KW_i^K, VW_i^V)",
+      "meaning": "Projects queries, keys, and values into h distinct representation subspaces, runs attention in parallel, concatenates, and projects back.",
+      "page": 5,
+      "variables": [
+        {
+          "symbol": "W_i^Q",
+          "meaning": "Learned query projection matrix for head i of dimension d_model x d_k"
+        },
+        {
+          "symbol": "W_i^K",
+          "meaning": "Learned key projection matrix for head i of dimension d_model x d_k"
+        },
+        {
+          "symbol": "W_i^V",
+          "meaning": "Learned value projection matrix for head i of dimension d_model x d_v"
+        },
+        {
+          "symbol": "W^O",
+          "meaning": "Final output linear projection matrix of dimension (h * d_v) x d_model"
+        },
+        {
+          "symbol": "h",
+          "meaning": "Number of parallel attention heads (set to 8 in base model)"
+        }
+      ]
+    },
+    {
+      "id": "Q3",
+      "name": "Position-wise Feed-Forward Network",
+      "latex": "\\text{FFN}(x) = \\max(0, xW_1 + b_1)W_2 + b_2",
+      "meaning": "Applies two linear transformations with an intermediate ReLU activation independently and identically to each position.",
+      "page": 5,
+      "variables": [
+        {
+          "symbol": "x",
+          "meaning": "Input representation vector at a given position of dimension d_model"
+        },
+        {
+          "symbol": "W_1, b_1",
+          "meaning": "Weight matrix and bias for the first linear expansion layer (inner dimension d_ff = 2048)"
+        },
+        {
+          "symbol": "W_2, b_2",
+          "meaning": "Weight matrix and bias for the second linear projection layer returning to d_model"
+        }
+      ]
+    },
+    {
+      "id": "Q4",
+      "name": "Sinusoidal Positional Encoding",
+      "latex": "PE_{(pos, 2i)} = \\sin\\left(\\frac{pos}{10000^{2i/d_{\\text{model}}}}\\right), \\quad PE_{(pos, 2i+1)} = \\cos\\left(\\frac{pos}{10000^{2i/d_{\\text{model}}}}\\right)",
+      "meaning": "Encodes position indices into sinusoid frequencies forming a geometric progression from 2*pi to 10000*2*pi.",
+      "page": 6,
+      "variables": [
+        {
+          "symbol": "pos",
+          "meaning": "Absolute sequence position index of the token"
+        },
+        {
+          "symbol": "i",
+          "meaning": "Dimension index within the embedding vector (from 0 to d_model/2 - 1)"
+        },
+        {
+          "symbol": "d_{\\text{model}}",
+          "meaning": "Total dimension of the model representations (512 in base)"
+        }
+      ]
+    },
+    {
+      "id": "Q5",
+      "name": "Learning Rate Schedule",
+      "latex": "lrate = d_{\\text{model}}^{-0.5} \\cdot \\min(\\text{step\\_num}^{-0.5}, \\text{step\\_num} \\cdot \\text{warmup\\_steps}^{-1.5})",
+      "meaning": "Increases learning rate linearly during warmup steps and decays it proportionally to the inverse square root of step number thereafter.",
+      "page": 7,
+      "variables": [
+        {
+          "symbol": "step\\_num",
+          "meaning": "Current training iteration number"
+        },
+        {
+          "symbol": "warmup\\_steps",
+          "meaning": "Number of initial linear warmup iterations (set to 4000)"
+        },
+        {
+          "symbol": "d_{\\text{model}}",
+          "meaning": "Model embedding dimensionality (512)"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    {
+      "id": "L1",
+      "short": "Quadratic Sequence Complexity",
+      "text": "Full self-attention scales quadratically O(n^2 * d) in both computation and memory with sequence length n, making long document processing prohibitively expensive.",
+      "acknowledged": true,
+      "severity": 85,
+      "page": 7
+    },
+    {
+      "id": "L2",
+      "short": "Sequential Autoregressive Inference",
+      "text": "While training is fully parallelized across all positions, generating outputs during inference remains strictly sequential one token at a time.",
+      "acknowledged": true,
+      "severity": 75,
+      "page": 10
+    },
+    {
+      "id": "L3",
+      "short": "Loss of Resolution from Averaging",
+      "text": "Weighted summation across entire sequences reduces effective spatial resolution, requiring multi-head projections to disentangle conflicting signals.",
+      "acknowledged": true,
+      "severity": 45,
+      "page": 2
+    },
+    {
+      "id": "L4",
+      "short": "Linear Memory Cache Growth in Decoding",
+      "text": "Autoregressive generation requires storing key and value projections for all previous steps in GPU memory, causing cache size to scale linearly with output length.",
+      "acknowledged": false,
+      "severity": 65,
+      "page": 5
+    }
+  ],
+  "citations": [
+    {
+      "id": "R1",
+      "title": "Layer normalization",
+      "authors": "Jimmy Lei Ba, Jamie Ryan Kiros, Geoffrey E Hinton",
+      "year": 2016,
+      "role": "foundation"
+    },
+    {
+      "id": "R2",
+      "title": "Neural machine translation by jointly learning to align and translate",
+      "authors": "Dzmitry Bahdanau, Kyunghyun Cho, Yoshua Bengio",
+      "year": 2014,
+      "role": "foundation"
+    },
+    {
+      "id": "R3",
+      "title": "Convolutional sequence to sequence learning",
+      "authors": "Jonas Gehring, Michael Auli, David Grangier, Denis Yarats, Yann N. Dauphin",
+      "year": 2017,
+      "role": "contrast"
+    },
+    {
+      "id": "R4",
+      "title": "Long short-term memory",
+      "authors": "Sepp Hochreiter, Jürgen Schmidhuber",
+      "year": 1997,
+      "role": "contrast"
+    },
+    {
+      "id": "R5",
+      "title": "Adam: A method for stochastic optimization",
+      "authors": "Diederik Kingma, Jimmy Ba",
+      "year": 2015,
+      "role": "method"
+    },
+    {
+      "id": "R6",
+      "title": "Google's neural machine translation system: Bridging the gap between human and machine translation",
+      "authors": "Yonghui Wu, Mike Schuster, Zhifeng Chen, Quoc V Le, Mohammad Norouzi, et al.",
+      "year": 2016,
+      "role": "contrast"
+    },
+    {
+      "id": "R7",
+      "title": "Neural machine translation in linear time",
+      "authors": "Nal Kalchbrenner, Lasse Espeholt, Karen Simonyan, Aaron van den Oord, Alex Graves, Koray Kavukcuoglu",
+      "year": 2017,
+      "role": "contrast"
+    },
+    {
+      "id": "R8",
+      "title": "Deep residual learning for image recognition",
+      "authors": "Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun",
+      "year": 2016,
+      "role": "foundation"
+    }
+  ],
+  "edges": [
+    {
+      "source": "E1",
+      "target": "C1",
+      "relation": "supports"
+    },
+    {
+      "source": "E2",
+      "target": "C1",
+      "relation": "supports"
+    },
+    {
+      "source": "E3",
+      "target": "C1",
+      "relation": "supports"
+    },
+    {
+      "source": "A1",
+      "target": "C1",
+      "relation": "assumes"
+    },
+    {
+      "source": "A3",
+      "target": "C1",
+      "relation": "assumes"
+    },
+    {
+      "source": "A4",
+      "target": "C1",
+      "relation": "assumes"
+    },
+    {
+      "source": "E1",
+      "target": "C2",
+      "relation": "supports"
+    },
+    {
+      "source": "E2",
+      "target": "C2",
+      "relation": "supports"
+    },
+    {
+      "source": "A1",
+      "target": "C2",
+      "relation": "assumes"
+    },
+    {
+      "source": "E3",
+      "target": "C3",
+      "relation": "supports"
+    },
+    {
+      "source": "A3",
+      "target": "C3",
+      "relation": "assumes"
+    },
+    {
+      "source": "E4",
+      "target": "C4",
+      "relation": "supports"
+    },
+    {
+      "source": "A4",
+      "target": "C4",
+      "relation": "assumes"
+    },
+    {
+      "source": "E6",
+      "target": "C5",
+      "relation": "supports"
+    },
+    {
+      "source": "A1",
+      "target": "C5",
+      "relation": "assumes"
+    },
+    {
+      "source": "E5",
+      "target": "C6",
+      "relation": "supports"
+    },
+    {
+      "source": "A2",
+      "target": "C6",
+      "relation": "assumes"
+    },
+    {
+      "source": "M1",
+      "target": "Q1",
+      "relation": "uses"
+    },
+    {
+      "source": "M2",
+      "target": "Q2",
+      "relation": "uses"
+    },
+    {
+      "source": "M4",
+      "target": "M1",
+      "relation": "uses"
+    },
+    {
+      "source": "M4",
+      "target": "M2",
+      "relation": "uses"
+    },
+    {
+      "source": "M4",
+      "target": "M3",
+      "relation": "uses"
+    },
+    {
+      "source": "M4",
+      "target": "Q3",
+      "relation": "uses"
+    },
+    {
+      "source": "M4",
+      "target": "Q5",
+      "relation": "uses"
+    },
+    {
+      "source": "Q1",
+      "target": "C6",
+      "relation": "derives"
+    },
+    {
+      "source": "Q2",
+      "target": "C4",
+      "relation": "derives"
+    },
+    {
+      "source": "R2",
+      "target": "M1",
+      "relation": "builds_on"
+    },
+    {
+      "source": "R1",
+      "target": "M4",
+      "relation": "builds_on"
+    },
+    {
+      "source": "R8",
+      "target": "M4",
+      "relation": "builds_on"
+    },
+    {
+      "source": "R5",
+      "target": "M4",
+      "relation": "builds_on"
+    },
+    {
+      "source": "L1",
+      "target": "C1",
+      "relation": "limits"
+    },
+    {
+      "source": "L2",
+      "target": "C1",
+      "relation": "limits"
+    },
+    {
+      "source": "C3",
+      "target": "C1",
+      "relation": "supports"
+    },
+    {
+      "source": "C1",
+      "target": "C2",
+      "relation": "leads_to"
+    },
+    {
+      "source": "C1",
+      "target": "C5",
+      "relation": "leads_to"
+    },
+    {
+      "source": "E7",
+      "target": "M3",
+      "relation": "supports"
+    }
+  ]
+}
